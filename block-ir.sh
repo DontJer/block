@@ -2,18 +2,19 @@ sudo apt-get install jq -y
 
 
 cp /root/marzban/xray_config.json /root/marzban/xray_config.json.bak
-
 export xray=$(cat /root/marzban/xray_config.json | jq '.routing.domainStrategy = "IPIfNonMatch"')
 
 export xray=$(echo "$xray" | jq '.routing.rules[0].ip += ["geoip:ir"]')
 
 export xray=$(echo "$xray" | jq '.routing.rules += [{"outboundTag": "blackhole", "domain": ["regexp:.*\\.ir$", "ext:iran.dat:ir", "ext:iran.dat:other", "geosite:category-ir", "blogfa", "bank", "tebyan.net", "beytoote.com", "Film2movie.ws", "Setare.com", "downloadha.com", "Sanjesh.org"], "type": "field"}]' )
 
-echo $(echo "$xray" | jq '.outbounds |= map(if .protocol == "blackhole" then .tag = "blackhole" else . end)') > /root/marzban/xray_config.json
+export xray=$(echo "$xray" | jq '.outbounds |= map(if .protocol == "blackhole" then .tag = "blackhole" else . end)')
+
+echo "$xray" > /root/marzban/xray_config.json
 
 mkdir -p /var/lib/marzban/assets/
 
-echo 'XRAY_ASSETS_PATH="/var/lib/marzban/assets/"' >> /root/marzban/env
+echo -e "\nXRAY_ASSETS_PATH=\"/var/lib/marzban/assets/\"" >> /root/marzban/env
 
 cat >/root/download-dats.sh <<EOL
 wget -O /var/lib/marzban/assets/geosite.dat https://github.com/v2fly/domain-list-community/releases/latest/download/dlc.dat
