@@ -25,6 +25,9 @@ wget -O /var/lib/marzban/assets/iran.dat https://github.com/bootmortis/iran-host
 
 EOL
 
+# remove cronjobs
+sudo crontab -l | grep -v '/root/download-dats.sh' | crontab -
+
 { crontab -l -u root; echo "0 */4 * * * /bin/bash /root/download-dats.sh >/dev/null 2>&1"; } | crontab -u root -
 
 bash /root/download-dats.sh
