@@ -1,15 +1,15 @@
 sudo apt-get install jq -y
 
 
-cp /root/marzban/xray_coinfg.json /root/marzban/xray_coinfg.json.bak
+cp /root/marzban/xray_config.json /root/marzban/xray_config.json.bak
 
-export xray=$(cat /root/marzban/xray_coinfg.json | jq '.routing.domainStrategy = "IPIfNonMatch"')
+export xray=$(cat /root/marzban/xray_config.json | jq '.routing.domainStrategy = "IPIfNonMatch"')
 
 export xray=$(echo "$xray" | jq '.routing.rules[0].ip += ["geoip:ir"]')
 
 export xray=$(echo "$xray" | jq '.routing.rules += [{"outboundTag": "blackhole", "domain": ["regexp:.*\\.ir$", "ext:iran.dat:ir", "ext:iran.dat:other", "geosite:category-ir", "blogfa", "bank", "tebyan.net", "beytoote.com", "Film2movie.ws", "Setare.com", "downloadha.com", "Sanjesh.org"], "type": "field"}]' )
 
-echo $(echo "$xray" | jq '.outbounds |= map(if .protocol == "blackhole" then .tag = "blackhole" else . end)') > /root/marzban/xray_coinfg.json
+echo $(echo "$xray" | jq '.outbounds |= map(if .protocol == "blackhole" then .tag = "blackhole" else . end)') > /root/marzban/xray_config.json
 
 mkdir -p /var/lib/marzban/assets/
 
